@@ -63,7 +63,7 @@ export async function getProducts(productId?: string) {
 	} else {
 		// Fetch all products ordered by creation date
 		const response = await connection.query<ProductSchemaInterface>(
-			`SELECT * FROM Products ORDER BY createdAt DESC`
+			`SELECT * FROM Products ORDER BY created_at DESC`
 		);
 		return prettifyProducts(response.rows);
 	}

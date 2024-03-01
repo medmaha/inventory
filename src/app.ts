@@ -53,6 +53,7 @@ app.use(loggerMiddleware);
 const PORT = Number(process.env.PORT || 5000);
 
 app.listen(PORT, async () => {
+	console.log("Booting Application...");
 	try {
 		await initializeDB();
 		console.log(`Server up and running on port ${PORT}`);
