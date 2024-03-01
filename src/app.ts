@@ -41,7 +41,7 @@ app.get("/clear", async (req, res) => {
 });
 
 // including the product and transaction endpoints
-app.all("/products", productRouter);
+app.use("/products", productRouter);
 app.use("/transactions", transactionsRouter);
 app.use("/*", catchAllRouter);
 

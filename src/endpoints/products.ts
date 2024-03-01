@@ -38,7 +38,7 @@ productRouter.get("/:id", async (req, res) => {
 		? res.json(row)
 		: res.status(400).json({
 				error: "Bad Request",
-				message: "Failed to get the product",
+				message: "Failed to retrieve the product details",
 		  });
 });
 
