@@ -47,17 +47,19 @@ git clone https://github.com/medmaha/inventory.git
 
 ```bash
 cd inventory
+npm install
 ```
 
+5. (Optional) Compile the typescript code:
+
 ```bash
-npm install # You can use `pnpm` if you prefer it
-npm compile # (Optional) - this compiles the typescript code to native javascript
+npm compile
 ```
 
-5. Start the server:
+6. Start the server:
 
 ```bash
-npm start
+npm dev
 ```
 
 ## Usage
