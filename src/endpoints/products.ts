@@ -152,8 +152,8 @@ productRouter.get("/:id/stats", async (req, res) => {
 		total_transactions: transactions.length,
 		average_transactions_qty: (total_quantity / transactions.length).toFixed(),
 		total_quantity_perished: product.perishable_qty,
-		date_created: product.createdAt,
-		last_modified_date: product.updatedAt,
+		date_created: product.updated_at,
+		last_modified_date: product.updated_at,
 	};
 
 	return res.status(200).json(statistics);

@@ -68,3 +68,4 @@ npm start
 ## Live Demo
 
 - [Explore Live Demo](https://mahamed-inventory.vercel.app)
+- [Explore with Postman](https://www.postman.com/deluxeguy/workspace/inventory-app/documentation/20045475-8f1f5b0d-500d-492d-9706-63beb50a2fe2)

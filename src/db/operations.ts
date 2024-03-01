@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import connection from "./connection";
+import { format } from "date-fns";
 import { ProductSchemaInterface, TransactionSchemaInterface } from "./schema";
 
 // Creates a new product
@@ -51,23 +52,20 @@ export async function deleteProduct(id: string) {
 
 // Gets one or all products
 export async function getProducts(productId?: string) {
-	try {
-		// Check if a specific product ID is provided
-		if (productId) {
-			const response = await connection.query<ProductSchemaInterface>(
-				`SELECT * FROM Products WHERE id = $1 LIMIT 1`,
-				[productId]
-			);
-			return response.rows[0];
-		} else {
-			// Fetch all products ordered by creation date
-			const response = await connection.query<ProductSchemaInterface>(
-				`SELECT * FROM Products ORDER BY createdAt DESC`
-			);
-			return response.rows;
-		}
-	} catch (error) {
-		return null;
+	// Check if a specific product ID is provided
+	if (productId) {
+		const response = await connection.query<ProductSchemaInterface>(
+			`SELECT * FROM Products WHERE id = $1 LIMIT 1`,
+			[productId]
+		);
+		if (!response.rowCount) return false;
+		return prettifyProducts(response.rows[0]);
+	} else {
+		// Fetch all products ordered by creation date
+		const response = await connection.query<ProductSchemaInterface>(
+			`SELECT * FROM Products ORDER BY createdAt DESC`
+		);
+		return prettifyProducts(response.rows);
 	}
 }
 
@@ -180,13 +178,13 @@ export async function getTransactions(productId?: string) {
 				`SELECT * FROM Transactions WHERE product_id = $1`,
 				[productId]
 			);
-			return response.rows;
+			return prettifyTransactions(response.rows);
 		} else {
 			// Fetch all transactions ordered by timestamp
 			const response = await connection.query<TransactionSchemaInterface>(
 				`SELECT * FROM Transactions ORDER BY timestamp DESC`
 			);
-			return response.rows;
+			return prettifyTransactions(response.rows);
 		}
 	} catch (error) {
 		return null;
@@ -211,3 +209,35 @@ export async function clearDatabaseTable(table?: "products" | "transactions") {
 }
 
 type Json = { [x: string]: any };
+
+// Formats products the date to a more readable format
+function prettifyProducts(
+	data: ProductSchemaInterface | ProductSchemaInterface[]
+) {
+	function make(product: ProductSchemaInterface) {
+		return {
+			...product,
+			created_at: format(new Date(product.created_at), "PPPPpp"),
+			updated_at: format(new Date(product.updated_at), "PPPPpp"),
+		};
+	}
+	if (Array.isArray(data)) {
+		return data.map((product) => make(product));
+	}
+	return make(data);
+}
+// Formats transactions the date to a more readable format
+function prettifyTransactions(
+	data: TransactionSchemaInterface | TransactionSchemaInterface[]
+) {
+	function make(transaction: TransactionSchemaInterface) {
+		return {
+			...transaction,
+			timestamp: format(new Date(transaction.timestamp), "PPPPpp"),
+		};
+	}
+	if (Array.isArray(data)) {
+		return data.map((product) => make(product));
+	}
+	return make(data);
+}

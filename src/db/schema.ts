@@ -10,11 +10,11 @@ const ProductSchema = `
         incoming_qty INT NOT NULL DEFAULT 0,
         sold_qty INT NOT NULL DEFAULT 0,
         perishable_qty INT NOT NULL DEFAULT 0,
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE OR REPLACE FUNCTION update_updatedAt_column() 
+    CREATE OR REPLACE FUNCTION update_updated_at_column() 
 		RETURNS TRIGGER AS $$
 		BEGIN
 			NEW.updatedAt = now();
@@ -25,7 +25,7 @@ const ProductSchema = `
 	CREATE OR REPLACE TRIGGER update_product_modtime 
 		BEFORE UPDATE ON Products 
 			FOR EACH ROW 
-				EXECUTE PROCEDURE update_updatedAt_column();
+				EXECUTE PROCEDURE update_updated_at_column();
 `;
 
 const TransactionSchema = `
@@ -48,15 +48,14 @@ type ProductSchemaInterface = {
 	incoming_qty: number;
 	sold_qty: number;
 	perishable_qty: number;
-	createdAt: string;
-	updatedAt: string;
+	created_at: string;
+	updated_at: string;
 };
 type TransactionSchemaInterface = {
 	id: string;
 	quantity: string;
 	product_id: string;
-	createdAt: string;
-	updatedAt: string;
+	timestamp: string;
 };
 
 export {
