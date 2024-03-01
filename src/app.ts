@@ -45,8 +45,16 @@ app.use("/products", productRouter);
 app.use("/transactions", transactionsRouter);
 app.use("/*", catchAllRouter);
 
-export async function init() {
-	await initializeDB();
-}
+const PORT = Number(process.env.PORT || 5000);
+
+app.listen(PORT, async () => {
+	try {
+		await initializeDB();
+		console.log(`Server up and running on port ${PORT}`);
+	} catch (error: any) {
+		console.log("[ERROR] failed to boot up application");
+		process.exit();
+	}
+});
 
 export default app;
