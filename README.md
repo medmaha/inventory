@@ -28,25 +28,33 @@ It provides endpoints for managing products and transactions in an inventory sys
 git clone https://github.com/medmaha/inventory.git
 ```
 
-2. Install dependencies:
+2. Set up the PostgreSQL database:
+
+   - Create a new PostgreSQL database.
+   - Update the database configuration in a `.env` file with your PostgreSQL Database credentials.
+
+3. Set Environment Variables:
+
+```bash
+   DATABASE=<your_database_name>
+   DATABASE_HOST=<your_database_host>
+   DATABASE_PORT=<your_database_port>
+   DATABASE_USER=<your_database_user>
+   DATABASE_PASSWORD=<your_database_password>
+```
+
+4. Install dependencies:
 
 ```bash
 cd inventory
 ```
 
-- You can use pnpm if you prefer it
-
 ```bash
-npm install
-npm build # (Optional) - this compiles the typescript code to native javascript
+npm install # You can use `pnpm` if you prefer it
+npm compile # (Optional) - this compiles the typescript code to native javascript
 ```
 
-3. Set up the PostgreSQL database:
-
-   - Create a new PostgreSQL database.
-   - Update the database configuration in a `.env` file with your PostgreSQL Database credentials.
-
-4. Start the server:
+5. Start the server:
 
 ```bash
 npm start

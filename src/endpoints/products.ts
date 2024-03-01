@@ -1,4 +1,3 @@
-import path from "path";
 import express from "express";
 import { loggerMiddleware } from "./middlewares";
 import {
@@ -17,8 +16,9 @@ import { ProductSchemaInterface } from "../db/schema";
 const productRouter = express.Router({
 	strict: true,
 });
-
 productRouter.use(loggerMiddleware);
+
+const ERROR_MESSAGE = "Bad Request";
 
 // View all products
 productRouter.get("/", async (_, res) => {
@@ -26,7 +26,7 @@ productRouter.get("/", async (_, res) => {
 	return rows
 		? res.json(rows || [])
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to retrieve products",
 		  });
 });
@@ -37,7 +37,7 @@ productRouter.get("/:id", async (req, res) => {
 	return row
 		? res.json(row)
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to retrieve the product details",
 		  });
 });
@@ -49,7 +49,7 @@ productRouter.post("/", async (req, res) => {
 	return created
 		? res.status(201).json({ id: productId })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to create a new product",
 		  });
 });
@@ -60,7 +60,7 @@ productRouter.patch("/:id", async (req, res) => {
 	return updated
 		? res.status(200).json({ success: true })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to update product",
 		  });
 });
@@ -71,7 +71,7 @@ productRouter.delete("/:id", async (req, res) => {
 	return deleted
 		? res.status(200).json({ success: true })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to delete product",
 		  });
 });
@@ -82,7 +82,7 @@ productRouter.post("/:id/sell", async (req, res) => {
 	return sold
 		? res.status(200).json({ success: true })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to sell product",
 		  });
 });
@@ -93,7 +93,7 @@ productRouter.post("/:id/expired", async (req, res) => {
 	return set
 		? res.status(200).json({ success: true })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to set product as expired",
 		  });
 });
@@ -104,7 +104,7 @@ productRouter.patch("/:id/add-quantity", async (req, res) => {
 	return added
 		? res.status(200).json({ success: true })
 		: res.status(400).json({
-				error: "Bad Request",
+				error: ERROR_MESSAGE,
 				message: "Failed to update product quantity",
 		  });
 });
@@ -120,18 +120,21 @@ productRouter.get("/:id/stats", async (req, res) => {
 	// If either product or transactions are missing, return error response
 	if (!product || !Array.isArray(transactions)) {
 		return res.status(400).json({
-			error: "Bad Request",
+			error: ERROR_MESSAGE,
 			message: "Failed to retrieve product statistics",
 		});
 	}
 
-	// Calculate product total supply quantities
-	const total_transactions = transactions.reduce(
+	// Calculate the product total supply quantity
+	const total_quantity = transactions.reduce(
 		(acc, trans) => acc + Number(trans.quantity),
 		0
 	);
-	const expenses =
-		(total_transactions + product.initial_qty) * product.cost_price;
+
+	// Calculate the total expense of this product
+	const expenses = (total_quantity + product.initial_qty) * product.cost_price;
+
+	// Calculate the total revenue
 	const revenue = product.sold_qty * product.selling_price;
 
 	// Prepare statistics object
@@ -145,11 +148,9 @@ productRouter.get("/:id/stats", async (req, res) => {
 		profit: `D${Math.max(revenue - expenses, 0).toFixed(2)}`,
 		total_sales: `D${revenue.toFixed(2)} GMD`,
 		total_expenses: `D${expenses.toFixed(2)} GMD`,
-		total_quantity: total_transactions + product.initial_qty,
+		total_quantity: total_quantity + product.initial_qty,
 		total_transactions: transactions.length,
-		average_transactions_qty: (
-			total_transactions / transactions.length
-		).toFixed(),
+		average_transactions_qty: (total_quantity / transactions.length).toFixed(),
 		total_quantity_perished: product.perishable_qty,
 		date_created: product.createdAt,
 		last_modified_date: product.updatedAt,

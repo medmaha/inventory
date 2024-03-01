@@ -2,12 +2,15 @@ import path from "path";
 import express from "express";
 import multer from "multer";
 import { initializeDB } from "./db/connection";
-import { productRouter, transactionsRouter, catchAllRouter } from "./endpoints";
 import { clearDatabaseTable } from "./db/operations";
+import productRouter from "./endpoints/products";
+import transactionsRouter from "./endpoints/transactions";
+import catchAllRouter from "./endpoints/catch-all";
+import { loggerMiddleware } from "./endpoints/middlewares";
 
 const app = express();
 
-app.use(express.static("./"));
+app.use(express.static("./public"));
 
 // Middleware to parse application/json
 app.use(express.json());
@@ -24,26 +27,28 @@ app.get("/", (_, res) => {
 		.sendFile(path.join(appDir, "public", "index.html"));
 });
 
-// clear a the database tables if the table query param is given
-app.get("/clear", async (req, res) => {
-	const deleted = await clearDatabaseTable(
-		req.query.table as "products" | "transactions" | undefined
-	);
-	return deleted
-		? res.json({
-				success: true,
-				message: `Database table "${req.query.table}" cleared successfully`,
-		  })
-		: res.status(400).json({
-				error: "Bad Request",
-				message: `Failed to clear database table "${req.query.table}"`,
-		  });
+// Resets the database table's
+app.get("/reset", async (req, res) => {
+	const tableName = req.query.table as "products" | "transactions" | undefined;
+
+	const deleted = await clearDatabaseTable(tableName);
+
+	if (deleted)
+		return res.json({
+			success: true,
+			message: `Database table "${req.query.table}" cleared successfully`,
+		});
+	return res.status(400).json({
+		error: "Bad Request",
+		message: `Failed to clear database table "${req.query.table}"`,
+	});
 });
 
-// including the product and transaction endpoints
+// Include the products and transactions endpoints
 app.use("/products", productRouter);
 app.use("/transactions", transactionsRouter);
 app.use("/*", catchAllRouter);
+app.use(loggerMiddleware);
 
 const PORT = Number(process.env.PORT || 5000);
 
