@@ -1,5 +1,5 @@
 // Products Database Schema
-const ProductSchema = `
+export const ProductSchema = `
     CREATE TABLE IF NOT EXISTS Products (
         id UUID PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ const ProductSchema = `
     CREATE OR REPLACE FUNCTION update_updated_at_column() 
 		RETURNS TRIGGER AS $$
 		BEGIN
-			NEW.updatedAt = now();
+			NEW.updated_at = now();
 			RETURN NEW; 
 		END;
 		$$ LANGUAGE 'plpgsql';
@@ -28,7 +28,7 @@ const ProductSchema = `
 				EXECUTE PROCEDURE update_updated_at_column();
 `;
 
-const TransactionSchema = `
+export const TransactionSchema = `
     CREATE TABLE IF NOT EXISTS Transactions (
         transaction_id VARCHAR(18) PRIMARY KEY,
         quantity INT NOT NULL,
@@ -38,7 +38,7 @@ const TransactionSchema = `
     )
 `;
 
-type ProductSchemaInterface = {
+export type ProductSchemaInterface = {
 	id: string;
 	name: string;
 	cost_price: number;
@@ -51,16 +51,10 @@ type ProductSchemaInterface = {
 	created_at: string;
 	updated_at: string;
 };
-type TransactionSchemaInterface = {
+
+export type TransactionSchemaInterface = {
 	id: string;
 	quantity: string;
 	product_id: string;
 	timestamp: string;
-};
-
-export {
-	ProductSchema,
-	TransactionSchema,
-	ProductSchemaInterface,
-	TransactionSchemaInterface,
 };
